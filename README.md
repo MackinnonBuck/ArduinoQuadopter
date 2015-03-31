@@ -1,4 +1,3 @@
 # ArduinoQuadopter
---Contains the code for my homemade Arduino quadcopter--
 
-This file will be updated with important information about hardware, etc. as time goes on.
+this file will be uptaded as time goes on.  Expect to see configuration and troubleshooting information in the future.
