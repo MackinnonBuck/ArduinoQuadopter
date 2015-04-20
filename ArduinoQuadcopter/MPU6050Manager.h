@@ -1,19 +1,14 @@
 /*
  * MPU6050Manager.h
  *
- *  Created on: Mar 8, 2015
+ *  Created on: Apr 19, 2015
  *      Author: Mackinnon Buck
  */
 
-#ifndef MPU6050MANAGER_H_
-#define MPU6050MANAGER_H_
+#ifndef ARDUINOQUADCOPTER_OLD_MPU6050MANAGER_H_
+#define ARDUINOQUADCOPTER_OLD_MPU6050MANAGER_H_
 
-#include "I2Cdev.h"
 #include "MPU6050.h"
-
-#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-    #include "Wire.h"
-#endif
 
 class MPU6050Manager {
 
@@ -21,39 +16,32 @@ private:
 
 	static MPU6050Manager* m_pInstance;
 
-	bool m_bInitialized;
+	MPU6050 m_mpu;
 
-	MPU6050 m_MPU6050;
+	uint8_t m_devStatus;
+	uint8_t m_mpuIntStatus;
+	uint8_t m_fifoBuffer[64];
 
-	float m_ax;
-	float m_ay;
-	float m_az;
-	float m_gx;
-	float m_gy;
-	float m_gz;
+	uint16_t m_packetSize;
+	uint16_t m_fifoCount;
+
+	bool m_dmpReady;
+	volatile bool m_mpuInterrupt;
 
 	MPU6050Manager();
 
-	float scale(int16_t value, float min, float max);
+	static void dmpDataReady();
 
 public:
 
 	static MPU6050Manager* getInstance();
 
-	bool initialized();
+	uint8_t initialize();
 
-	void initialize(int16_t xAccelOffset, int16_t yAccelOffset, int16_t zAccelOffset,
-			int16_t xGyroOffset, int16_t yGyroOffset, int16_t zGyroOffset);
+	bool isDmpReady();
+	bool hasInterrupted();
+
 	void update();
-
-	float getAccelX();
-	float getAccelY();
-	float getAccelZ();
-
-	float getGyroX();
-	float getGyroY();
-	float getGyroZ();
-
 };
 
-#endif
+#endif /* ARDUINOQUADCOPTER_OLD_MPU6050MANAGER_H_ */

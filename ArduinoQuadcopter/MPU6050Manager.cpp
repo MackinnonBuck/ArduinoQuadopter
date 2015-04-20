@@ -1,23 +1,23 @@
 /*
  * MPU6050Manager.cpp
  *
- *  Created on: Mar 8, 2015
+ *  Created on: Apr 19, 2015
  *      Author: Mackinnon Buck
  */
 
+#include "MPU6050_6Axis_MotionApps20.h"
 #include "MPU6050Manager.h"
-#include "Arduino.h"
 
 MPU6050Manager* MPU6050Manager::m_pInstance = 0;
 
-MPU6050Manager::MPU6050Manager() : m_bInitialized(false), m_MPU6050(0x68),
-		m_ax(0), m_ay(0), m_az(0), m_gx(0), m_gy(0), m_gz(0)
+MPU6050Manager::MPU6050Manager() : m_devStatus(0), m_mpuIntStatus(0), m_packetSize(0), m_fifoCount(0),
+		m_dmpReady(false), m_mpuInterrupt(false)
 {
 }
 
-float MPU6050Manager::scale(int16_t value, float min, float max)
+void MPU6050Manager::dmpDataReady()
 {
-	return (value + 32768.0f) * (max - min) / (32767.0f +32768.0f) + min;
+	MPU6050Manager::getInstance()->m_mpuInterrupt = true;
 }
 
 MPU6050Manager* MPU6050Manager::getInstance()
@@ -28,70 +28,96 @@ MPU6050Manager* MPU6050Manager::getInstance()
 	return m_pInstance;
 }
 
-bool MPU6050Manager::initialized()
-{
-	return m_bInitialized;
-}
-
-void MPU6050Manager::initialize(int16_t xAccelOffset, int16_t yAccelOffset, int16_t zAccelOffset,
-		int16_t xGyroOffset, int16_t yGyroOffset, int16_t zGyroOffset)
+uint8_t MPU6050Manager::initialize()
 {
 	#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
 		Wire.begin();
+		TWBR = 24;
 	#elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
 		Fastwire::setup(400, true);
 	#endif
 
-	m_MPU6050.initialize();
-	m_bInitialized = m_MPU6050.testConnection();
+	Serial.begin(115200);
 
-	if (m_bInitialized)
+	m_mpu.initialize();
+
+	Serial.println(m_mpu.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
+
+	Serial.println("Initializing DMP...");
+	m_devStatus = m_mpu.dmpInitialize();
+
+	m_mpu.setXAccelOffset(-108);
+	m_mpu.setYAccelOffset(1160);
+	m_mpu.setZAccelOffset(2288);
+	m_mpu.setXGyroOffset(28);
+	m_mpu.setYGyroOffset(-28);
+	m_mpu.setZGyroOffset(8);
+
+	if (m_devStatus == 0)
 	{
-		m_MPU6050.setXAccelOffset(xAccelOffset);
-		m_MPU6050.setYAccelOffset(yAccelOffset);
-		m_MPU6050.setZAccelOffset(zAccelOffset);
-		m_MPU6050.setXGyroOffset(xGyroOffset);
-		m_MPU6050.setYGyroOffset(yGyroOffset);
-		m_MPU6050.setZGyroOffset(zGyroOffset);
+		Serial.println("Enabling DMP...");
+		m_mpu.setDMPEnabled(true);
+
+		Serial.println("Enabling interrupt detection...");
+		attachInterrupt(0, dmpDataReady, RISING);
+		m_mpuIntStatus = m_mpu.getIntStatus();
+
+		Serial.println("Waiting for first interrupt...");
+		m_dmpReady = true;
+
+		m_packetSize = m_mpu.dmpGetFIFOPacketSize();
 	}
+	else
+	{
+		Serial.print("DMP initialization failed (code ");
+		Serial.print(m_devStatus);
+		Serial.println(")");
+	}
+
+	return m_devStatus;
+}
+
+bool MPU6050Manager::isDmpReady()
+{
+	return m_dmpReady;
+}
+
+bool MPU6050Manager::hasInterrupted()
+{
+	return m_mpuInterrupt || m_fifoCount >= m_packetSize;
 }
 
 void MPU6050Manager::update()
 {
-	m_ax = scale(m_MPU6050.getAccelerationX(), -1.0, 1.0);
-	m_ay = scale(m_MPU6050.getAccelerationY(), -1.0, 1.0);
-	m_az = scale(m_MPU6050.getAccelerationZ(), -1.0, 1.0);
-	m_gx = scale(m_MPU6050.getRotationX(), -1.0, 1.0);
-	m_gy = scale(m_MPU6050.getRotationY(), -1.0, 1.0);
-	m_gz = scale(m_MPU6050.getRotationZ(), -1.0, 1.0);
-}
+	m_mpuInterrupt = false;
+	m_mpuIntStatus = m_mpu.getIntStatus();
 
-float MPU6050Manager::getAccelX()
-{
-	return m_ax;
-}
+	m_fifoCount = m_mpu.getFIFOCount();
 
-float MPU6050Manager::getAccelY()
-{
-	return m_ay;
-}
+	if ((m_mpuIntStatus & 0x10) || m_fifoCount == 1024)
+	{
+		m_mpu.resetFIFO();
+		Serial.println("FIFO overflow!");
+	}
+	else if (m_mpuIntStatus & 0x02)
+	{
+		while (m_fifoCount < m_packetSize) m_fifoCount = m_mpu.getFIFOCount();
 
-float MPU6050Manager::getAccelZ()
-{
-	return m_az;
-}
+		m_mpu.getFIFOBytes(m_fifoBuffer, m_packetSize);
 
-float MPU6050Manager::getGyroX()
-{
-	return m_gx;
-}
+		m_fifoCount -= m_packetSize;
 
-float MPU6050Manager::getGyroY()
-{
-	return m_gy;
-}
+		Quaternion q;
+		m_mpu.dmpGetQuaternion(&q, m_fifoBuffer);
+		Serial.print("quat\t");
+		Serial.print(q.w);
+		Serial.print("\t");
+		Serial.print(q.x);
+		Serial.print("\t");
+		Serial.print(q.y);
+		Serial.print("\t");
+		Serial.println(q.z);
 
-float MPU6050Manager::getGyroZ()
-{
-	return m_gz;
+		// TODO: Turn these quaternion values into ypr angles.
+	}
 }
