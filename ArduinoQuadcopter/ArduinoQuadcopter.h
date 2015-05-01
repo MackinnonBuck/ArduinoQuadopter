@@ -2,6 +2,7 @@
 #define _ArduinoQuadcopter_H_
 
 #include "Arduino.h"
+#include "MPU6050Manager.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,7 +12,5 @@ void setup();
 #ifdef __cplusplus
 } // extern "C"
 #endif
-
-#include "MPU6050Manager.h"
 
 #endif /* _ArduinoQuadcopter_H_ */

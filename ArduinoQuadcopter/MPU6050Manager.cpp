@@ -13,6 +13,14 @@ MPU6050Manager* MPU6050Manager::m_pInstance = 0;
 MPU6050Manager::MPU6050Manager() : m_devStatus(0), m_mpuIntStatus(0), m_packetSize(0), m_fifoCount(0),
 		m_dmpReady(false), m_mpuInterrupt(false)
 {
+	m_pPacket[0] = &m_fifoBuffer[0];
+    m_pPacket[1] = &m_fifoBuffer[1];
+    m_pPacket[2] = &m_fifoBuffer[4];
+    m_pPacket[3] = &m_fifoBuffer[5];
+    m_pPacket[4] = &m_fifoBuffer[8];
+    m_pPacket[5] = &m_fifoBuffer[9];
+    m_pPacket[6] = &m_fifoBuffer[12];
+    m_pPacket[7] = &m_fifoBuffer[13];
 }
 
 void MPU6050Manager::dmpDataReady()
@@ -20,6 +28,23 @@ void MPU6050Manager::dmpDataReady()
 	MPU6050Manager::getInstance()->m_mpuInterrupt = true;
 }
 
+/*
+ * Increases the pitch and roll range from -90 and 90 to -180 and 180
+ */
+void MPU6050Manager::extendAngle(float& angle)
+{
+	if (m_gravity[2] < 0)
+	{
+		if (angle > 0)
+			angle = 180 - angle;
+		else if (m_ypr[1] < 0)
+			angle = -180 - angle;
+	}
+}
+
+/*
+ * Returns the global MPU6050Manager instance
+ */
 MPU6050Manager* MPU6050Manager::getInstance()
 {
 	if (m_pInstance == 0)
@@ -28,7 +53,11 @@ MPU6050Manager* MPU6050Manager::getInstance()
 	return m_pInstance;
 }
 
-uint8_t MPU6050Manager::initialize()
+/*
+ * Initializes the MPU6050 with specific offsets
+ */
+uint8_t MPU6050Manager::initialize(int16_t xAccelOffset, int16_t yAccelOffset, int16_t zAccelOffset,
+		int16_t xGyroOffset, int16_t yGyroOffset, int16_t zGyroOffset)
 {
 	#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
 		Wire.begin();
@@ -46,12 +75,12 @@ uint8_t MPU6050Manager::initialize()
 	Serial.println("Initializing DMP...");
 	m_devStatus = m_mpu.dmpInitialize();
 
-	m_mpu.setXAccelOffset(-108);
-	m_mpu.setYAccelOffset(1160);
-	m_mpu.setZAccelOffset(2288);
-	m_mpu.setXGyroOffset(28);
-	m_mpu.setYGyroOffset(-28);
-	m_mpu.setZGyroOffset(8);
+	m_mpu.setXAccelOffset(xAccelOffset);
+	m_mpu.setYAccelOffset(yAccelOffset);
+	m_mpu.setZAccelOffset(zAccelOffset);
+	m_mpu.setXGyroOffset(xGyroOffset);
+	m_mpu.setYGyroOffset(yGyroOffset);
+	m_mpu.setZGyroOffset(zGyroOffset);
 
 	if (m_devStatus == 0)
 	{
@@ -107,17 +136,51 @@ void MPU6050Manager::update()
 
 		m_fifoCount -= m_packetSize;
 
-		Quaternion q;
-		m_mpu.dmpGetQuaternion(&q, m_fifoBuffer);
-		Serial.print("quat\t");
-		Serial.print(q.w);
-		Serial.print("\t");
-		Serial.print(q.x);
-		Serial.print("\t");
-		Serial.print(q.y);
-		Serial.print("\t");
-		Serial.println(q.z);
+		// Get quaternion values
+        m_quat[0] = ((*m_pPacket[0] << 8) | *m_pPacket[1]) / 16384.0f;
+        m_quat[1] = ((*m_pPacket[2] << 8) | *m_pPacket[3]) / 16384.0f;
+        m_quat[2] = ((*m_pPacket[4] << 8) | *m_pPacket[5]) / 16384.0f;
+        m_quat[3] = ((*m_pPacket[6] << 8) | *m_pPacket[7]) / 16384.0f;
+        for (int i = 0; i < 4; i++) if (m_quat[i] >= 2.0f) m_quat[i] = -4.0f + m_quat[i];
 
-		// TODO: Turn these quaternion values into ypr angles.
+        // Get gravity calculations
+        m_gravity[0] = 2 * (m_quat[1] * m_quat[3] - m_quat[0] * m_quat[2]);
+        m_gravity[1] = 2 * (m_quat[0] * m_quat[1] + m_quat[2] * m_quat[3]);
+        m_gravity[2] = m_quat[0] * m_quat[0] - m_quat[1] * m_quat[1] -
+        		m_quat[2] * m_quat[2] + m_quat[3] * m_quat[3];
+
+        // Gey ypr values
+	    m_ypr[0] = atan2(2*m_quat[1]*m_quat[2] - 2*m_quat[0]*m_quat[3],
+	    		2*m_quat[0]*m_quat[0] + 2*m_quat[1]*m_quat[1] - 1)*180.0f/PI;
+	    m_ypr[1] = atan(m_gravity[0] / sqrt(m_gravity[1]*m_gravity[1] + m_gravity[2]*m_gravity[2]))*180.0f/PI;
+	    m_ypr[2] = atan(m_gravity[1] / sqrt(m_gravity[0]*m_gravity[0] + m_gravity[2]*m_gravity[2]))*180.0f/PI;
+
+	    // Increase the pitch and roll range from -90 and 90 to -180 and 180
+	    extendAngle(m_ypr[1]);
+	    extendAngle(m_ypr[2]);
 	}
+}
+
+/*
+ * Return the calculated quaternion values
+ */
+float* MPU6050Manager::getQuaternion()
+{
+	return m_quat;
+}
+
+/*
+ * Return the calculated gravity values
+ */
+float* MPU6050Manager::getGravity()
+{
+	return m_gravity;
+}
+
+/*
+ * Return the calculated yaw, pitch, and roll values
+ */
+float* MPU6050Manager::getYawPitchRoll()
+{
+	return m_ypr;
 }
