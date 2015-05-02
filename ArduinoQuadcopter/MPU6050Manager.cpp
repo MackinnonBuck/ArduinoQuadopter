@@ -5,7 +5,6 @@
  *      Author: Mackinnon Buck
  */
 
-//#include "MPU6050_6Axis_MotionApps20.h"
 #include "MPU6050Manager.h"
 
 MPU6050Manager* MPU6050Manager::m_pInstance = 0;
@@ -13,7 +12,6 @@ MPU6050Manager* MPU6050Manager::m_pInstance = 0;
 MPU6050Manager::MPU6050Manager() : m_devStatus(0), m_mpuIntStatus(0), m_packetSize(0), m_fifoCount(0),
 		m_dmpReady(false), m_mpuInterrupt(false)
 {
-
 	m_pPacket[0] = &m_fifoBuffer[0];
     m_pPacket[1] = &m_fifoBuffer[1];
     m_pPacket[2] = &m_fifoBuffer[4];
