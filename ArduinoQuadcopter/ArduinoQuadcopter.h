@@ -5,7 +5,8 @@
 #include "MPU6050Manager.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 void loop();
 void setup();
