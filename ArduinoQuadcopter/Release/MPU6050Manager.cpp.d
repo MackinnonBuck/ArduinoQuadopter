@@ -1,5 +1,5 @@
 MPU6050Manager.cpp.o MPU6050Manager.cpp.o: ../MPU6050Manager.cpp \
-  ../MPU6050_6Axis_MotionApps20.h ../I2Cdev.h \
+  ../MPU6050Manager.h ../MPU6050.h ../I2Cdev.h \
   C:\Arduino\hardware\arduino\avr\cores\arduino/Arduino.h \
   C:\Arduino\hardware\arduino\avr\cores\arduino/binary.h \
   C:\Arduino\hardware\arduino\avr\cores\arduino/WCharacter.h \
@@ -11,10 +11,11 @@ MPU6050Manager.cpp.o MPU6050Manager.cpp.o: ../MPU6050Manager.cpp \
   C:\Arduino\hardware\arduino\avr\cores\arduino/new.h \
   C:\Arduino\hardware\arduino\avr\variants\standard/pins_arduino.h \
   C:\Arduino\hardware\arduino\avr\libraries\Wire/Wire.h \
-  C:\Arduino\hardware\arduino\avr\cores\arduino/Stream.h \
-  ../helper_3dmath.h ../MPU6050.h ../MPU6050Manager.h
+  C:\Arduino\hardware\arduino\avr\cores\arduino/Stream.h
 
-../MPU6050_6Axis_MotionApps20.h:
+../MPU6050Manager.h:
+
+../MPU6050.h:
 
 ../I2Cdev.h:
 
@@ -41,9 +42,3 @@ C:\Arduino\hardware\arduino\avr\variants\standard/pins_arduino.h:
 C:\Arduino\hardware\arduino\avr\libraries\Wire/Wire.h:
 
 C:\Arduino\hardware\arduino\avr\cores\arduino/Stream.h:
-
-../helper_3dmath.h:
-
-../MPU6050.h:
-
-../MPU6050Manager.h:
