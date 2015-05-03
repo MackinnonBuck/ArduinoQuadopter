@@ -1,5 +1,5 @@
-ArduinoQuadcopter.cpp.o ArduinoQuadcopter.cpp.o:  \
- ../ArduinoQuadcopter.cpp ../ArduinoQuadcopter.h \
+ReceiverManager.cpp.o ReceiverManager.cpp.o: ../ReceiverManager.cpp \
+  ../ReceiverManager.h \
   C:\Arduino\hardware\arduino\avr\cores\arduino/Arduino.h \
   C:\Arduino\hardware\arduino\avr\cores\arduino/binary.h \
   C:\Arduino\hardware\arduino\avr\cores\arduino/WCharacter.h \
@@ -11,12 +11,9 @@ ArduinoQuadcopter.cpp.o ArduinoQuadcopter.cpp.o:  \
   C:\Arduino\hardware\arduino\avr\cores\arduino/new.h \
   C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/pins_arduino.h \
   C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/../standard/pins_arduino.h \
-  ../MPU6050Manager.h ../MPU6050.h ../I2Cdev.h \
-  C:\Arduino\hardware\arduino\avr\libraries\Wire/Wire.h \
-  C:\Arduino\hardware\arduino\avr\cores\arduino/Stream.h \
-  ../ReceiverManager.h
+  ../TimerOne.h ../EnableInterrupt.h
 
-../ArduinoQuadcopter.h:
+../ReceiverManager.h:
 
 C:\Arduino\hardware\arduino\avr\cores\arduino/Arduino.h:
 
@@ -40,14 +37,6 @@ C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/pins_arduino.h:
 
 C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/../standard/pins_arduino.h:
 
-../MPU6050Manager.h:
+../TimerOne.h:
 
-../MPU6050.h:
-
-../I2Cdev.h:
-
-C:\Arduino\hardware\arduino\avr\libraries\Wire/Wire.h:
-
-C:\Arduino\hardware\arduino\avr\cores\arduino/Stream.h:
-
-../ReceiverManager.h:
+../EnableInterrupt.h:

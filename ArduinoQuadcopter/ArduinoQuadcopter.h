@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "MPU6050Manager.h"
+#include "ReceiverManager.h"
 
 #ifdef __cplusplus
 extern "C"

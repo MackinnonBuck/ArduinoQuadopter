@@ -210,8 +210,6 @@ uint8_t MPU6050Manager::initialize(int16_t xAccelOffset, int16_t yAccelOffset,
 		Fastwire::setup(400, true);
 	#endif
 
-	Serial.begin(115200);
-
 	m_mpu.initialize();
 
 	Serial.println(

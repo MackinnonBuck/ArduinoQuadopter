@@ -9,7 +9,8 @@ MPU6050Manager.cpp.o MPU6050Manager.cpp.o: ../MPU6050Manager.cpp \
   C:\Arduino\hardware\arduino\avr\cores\arduino/Print.h \
   C:\Arduino\hardware\arduino\avr\cores\arduino/Printable.h \
   C:\Arduino\hardware\arduino\avr\cores\arduino/new.h \
-  C:\Arduino\hardware\arduino\avr\variants\standard/pins_arduino.h \
+  C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/pins_arduino.h \
+  C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/../standard/pins_arduino.h \
   C:\Arduino\hardware\arduino\avr\libraries\Wire/Wire.h \
   C:\Arduino\hardware\arduino\avr\cores\arduino/Stream.h
 
@@ -37,7 +38,9 @@ C:\Arduino\hardware\arduino\avr\cores\arduino/Printable.h:
 
 C:\Arduino\hardware\arduino\avr\cores\arduino/new.h:
 
-C:\Arduino\hardware\arduino\avr\variants\standard/pins_arduino.h:
+C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/pins_arduino.h:
+
+C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/../standard/pins_arduino.h:
 
 C:\Arduino\hardware\arduino\avr\libraries\Wire/Wire.h:
 
