@@ -11,7 +11,7 @@ ReceiverManager.cpp.o ReceiverManager.cpp.o: ../ReceiverManager.cpp \
   C:\Arduino\hardware\arduino\avr\cores\arduino/new.h \
   C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/pins_arduino.h \
   C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/../standard/pins_arduino.h \
-  ../TimerOne.h ../EnableInterrupt.h
+  ../EnableInterrupt.h
 
 ../ReceiverManager.h:
 
@@ -36,7 +36,5 @@ C:\Arduino\hardware\arduino\avr\cores\arduino/new.h:
 C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/pins_arduino.h:
 
 C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/../standard/pins_arduino.h:
-
-../TimerOne.h:
 
 ../EnableInterrupt.h:

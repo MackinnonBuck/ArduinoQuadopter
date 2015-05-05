@@ -1,12 +1,29 @@
 #include "ArduinoQuadcopter.h"
 
+#define ESC_FRONT_LEFT_PIN		9
+#define ESC_FRONT_RIGHT_PIN		10
+#define ESC_REAR_LEFT_PIN		11
+#define ESC_REAR_RIGHT_PIN		12
+
+ESC frontLeftESC;
+ESC frontRightESC;
+ESC rearLeftESC;
+ESC rearRightESC;
+
 void setup()
 {
 	Serial.begin(115200);
 
 	// Initialize the MPU6050Manager
 	MPU6050Manager::getInstance()->initialize(-108, 1160, 2288, 28, -28, 8);
+
+	// Initialize the ReceiverManager
 	ReceiverManager::getInstance()->initialize();
+
+	frontLeftESC = ESC(ESC_FRONT_LEFT_PIN);
+	frontRightESC = ESC(ESC_FRONT_RIGHT_PIN);
+	rearLeftESC = ESC(ESC_REAR_LEFT_PIN);
+	rearRightESC = ESC(ESC_REAR_RIGHT_PIN);
 }
 
 void loop()
@@ -20,8 +37,12 @@ void loop()
 
 		ReceiverManager::getInstance()->update();
 
-		// MPU6050 debugging
+		frontLeftESC.setValue(ReceiverManager::getInstance()->getValues()[0]);
+		frontRightESC.setValue(ReceiverManager::getInstance()->getValues()[0]);
+		rearLeftESC.setValue(ReceiverManager::getInstance()->getValues()[0]);
+		rearRightESC.setValue(ReceiverManager::getInstance()->getValues()[0]);
 
+		// MPU6050 debugging
 		/** /
 		Serial.print("ypr\t");
 		for (int i = 0; i < 3; i++)
@@ -33,7 +54,6 @@ void loop()
 		/**/
 
 		// Receiver debugging
-
 		/** /
 		Serial.print("typr:\t");
 		for (int i = 0; i < PIN_COUNT; i++)

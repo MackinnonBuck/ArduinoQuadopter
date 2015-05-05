@@ -15,9 +15,9 @@
 #define RC_PITCH 		5
 #define RC_ROLL 		4
 
-#define FREQ_MIN		1000
-#define	FREQ_MAX		2000
-#define FREQ_PADDING	200
+#define RECEIVER_FREQ_MIN		1000
+#define	RECEIVER_FREQ_MAX		2000
+#define RECEIVER_FREQ_PADDING	200
 
 #include <Arduino.h>
 
@@ -32,6 +32,9 @@ private:
 	float m_values[PIN_COUNT];
 
 	uint8_t m_currentPin;
+
+	long m_startTime;
+	long m_endTime;
 
 	ReceiverManager();
 
