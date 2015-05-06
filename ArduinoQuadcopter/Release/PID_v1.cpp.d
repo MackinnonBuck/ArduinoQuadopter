@@ -1,5 +1,4 @@
-ArduinoQuadcopter.cpp.o ArduinoQuadcopter.cpp.o:  \
- ../ArduinoQuadcopter.cpp ../ArduinoQuadcopter.h \
+PID_v1.cpp.o PID_v1.cpp.o: ../PID_v1.cpp \
   C:\Arduino\hardware\arduino\avr\cores\arduino/Arduino.h \
   C:\Arduino\hardware\arduino\avr\cores\arduino/binary.h \
   C:\Arduino\hardware\arduino\avr\cores\arduino/WCharacter.h \
@@ -11,12 +10,7 @@ ArduinoQuadcopter.cpp.o ArduinoQuadcopter.cpp.o:  \
   C:\Arduino\hardware\arduino\avr\cores\arduino/new.h \
   C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/pins_arduino.h \
   C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/../standard/pins_arduino.h \
-  ../MPU6050Manager.h ../MPU6050.h ../I2Cdev.h \
-  C:\Arduino\hardware\arduino\avr\libraries\Wire/Wire.h \
-  C:\Arduino\hardware\arduino\avr\cores\arduino/Stream.h \
-  ../ReceiverManager.h ../ESC.h ../Servo.h ../PID_v1.h
-
-../ArduinoQuadcopter.h:
+  ../PID_v1.h
 
 C:\Arduino\hardware\arduino\avr\cores\arduino/Arduino.h:
 
@@ -39,21 +33,5 @@ C:\Arduino\hardware\arduino\avr\cores\arduino/new.h:
 C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/pins_arduino.h:
 
 C:\Arduino\hardware\arduino\avr\variants\eightanaloginputs/../standard/pins_arduino.h:
-
-../MPU6050Manager.h:
-
-../MPU6050.h:
-
-../I2Cdev.h:
-
-C:\Arduino\hardware\arduino\avr\libraries\Wire/Wire.h:
-
-C:\Arduino\hardware\arduino\avr\cores\arduino/Stream.h:
-
-../ReceiverManager.h:
-
-../ESC.h:
-
-../Servo.h:
 
 ../PID_v1.h:

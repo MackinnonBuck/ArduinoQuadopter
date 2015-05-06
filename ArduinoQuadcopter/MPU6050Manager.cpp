@@ -301,15 +301,15 @@ void MPU6050Manager::update()
 				2 * m_quat[0] * m_quat[0] + 2 * m_quat[1] * m_quat[1] - 1)
 				* 180.0f / PI;
 		m_ypr[1] = atan(
-				m_gravity[0]
-						/ sqrt(
-								m_gravity[1] * m_gravity[1]
-										+ m_gravity[2] * m_gravity[2]))
-				* 180.0f/PI;
-		m_ypr[2] = atan(
 				m_gravity[1]
 						/ sqrt(
 								m_gravity[0] * m_gravity[0]
+										+ m_gravity[2] * m_gravity[2]))
+				* 180.0f/PI;
+		m_ypr[2] = atan(
+				m_gravity[0]
+						/ sqrt(
+								m_gravity[1] * m_gravity[1]
 										+ m_gravity[2] * m_gravity[2]))
 				* 180.0f/PI;
 

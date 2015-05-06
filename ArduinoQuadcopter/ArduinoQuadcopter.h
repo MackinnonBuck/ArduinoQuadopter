@@ -5,6 +5,7 @@
 #include "MPU6050Manager.h"
 #include "ReceiverManager.h"
 #include "ESC.h"
+#include "PID_v1.h"
 
 #ifdef __cplusplus
 extern "C"
