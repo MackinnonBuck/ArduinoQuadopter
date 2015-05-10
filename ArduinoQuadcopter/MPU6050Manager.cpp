@@ -282,6 +282,11 @@ void MPU6050Manager::update()
 
 		m_fifoCount -= m_packetSize;
 
+		// Get rate values
+		m_rate[0] = (float)m_mpu.getRotationZ() / 32767.0f * 2000.0f;
+		m_rate[1] = (float)m_mpu.getRotationX() / 32767.0f * 2000.0f;
+		m_rate[2] = (float)m_mpu.getRotationY() / 32767.0f * 2000.0f;
+
 		// Get quaternion values
 		m_quat[0] = ((*m_pPacket[0] << 8) | *m_pPacket[1]) / 16384.0f;
 		m_quat[1] = ((*m_pPacket[2] << 8) | *m_pPacket[3]) / 16384.0f;
@@ -341,4 +346,12 @@ float* MPU6050Manager::getGravity()
 float* MPU6050Manager::getYawPitchRoll()
 {
 	return m_ypr;
+}
+
+/*
+ * Return the calculated rate (yaw, pitch, roll)
+ */
+float* MPU6050Manager::getRate()
+{
+	return m_rate;
 }

@@ -267,6 +267,7 @@ private:
 	uint16_t m_packetSize;
 	uint16_t m_fifoCount;
 
+	float m_rate[3];
 	float m_quat[4];
 	float m_gravity[3];
 	float m_ypr[3];
@@ -298,6 +299,7 @@ public:
 	float* getQuaternion();
 	float* getGravity();
 	float* getYawPitchRoll();
+	float* getRate();
 };
 
 #endif /* _MPU6050MANAGER_H_ */
