@@ -876,7 +876,17 @@ void disableInterrupt (uint8_t interruptDesignator) {
 ////////////////////// ISRs /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
-#ifndef ISR // Security measure taken to prevent multiple definition
+
+// ---------- Custom modification by Mackinnon Buck ----------
+
+/*
+ * The following two definitions have been commented by Mackinnon Buck (not the author of this file).
+ * Uncomment these if your project does not include "WInterrupts.c" in the Arduino Library, or if you are
+ * getting an error stating that these are undefined. If uncommenting these following definitions results
+ * in a multiple-definition error, leave them commented.
+ */
+
+/*
 ISR(INT0_vect) {
   (*functionPointerArrayEXTERNAL[0])();
 }
@@ -884,6 +894,9 @@ ISR(INT0_vect) {
 ISR(INT1_vect) {
   (*functionPointerArrayEXTERNAL[1])();
 }
+*/
+
+// ---------- Custom modification by Mackinnon Buck ----------
 
 #if defined ARDUINO_MEGA || defined ARDUINO_LEONARDO
 ISR(INT2_vect) {
@@ -917,7 +930,6 @@ ISR(INT7_vect) {
 ISR(INT6_vect) {
   (*functionPointerArrayEXTERNAL[4])();
 }
-#endif
 #endif
 
 // If the compiler does not inline this, things break.
