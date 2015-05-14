@@ -3,9 +3,29 @@
 This project contains the code for a quadcopter that I have built. Feel free to copy/modify my code to fit your own needs.
 
 Following is a list of:
+* How to use this project
 * Major hardware components, a small description of them, and software notes regarding their use
 * Other minor components
 * Libraries used
+
+#How to use this project
+Before you test my code on your quadcopter, you should make sure that you use the same hardware components as I do or know how to adjust the code for hardware compensations (see the list of components below). You should know that I have the MPU6050 y-axis arrow pointing forward and the x-axis arrow pointing to the right. Also, you should check to confirm that you have the signal wires plugged in correctly. For your convenience, here's a list of what signal wires go where:
+* Receiver channel 1 -> digital input 4
+* Receiver channel 2 -> digital input 5
+* Receiver channel 3 -> digital input 6
+* Receiver channel 4 -> digital input 7
+* MPU6050 INT pin -> digital input 2
+* MPU6050 SDA pin -> analog input 4
+* MPU6050 SCL pin -> analog input 5
+* Front left ESC -> digital input 9
+* Front right ESC -> digital input 10
+* Rear left ESC -> digital input 11
+* Rear right ESC -> digital input 12
+
+After hardware setup is complete, it's time to setup the code. Copy the "ArduinoQuadcopter" folder and place it in your Arduino projects folder. Open ArduinoQuadcopter.ino and the Arduino IDE should launch (if it is installed, of course). After the Arduino IDE opens, click "verify" and make sure there aren't any errors in the code. BEFORE UPLOADING THE CODE TO YOUR ARDUINO, make sure that the propellers aren't installed on the quadcopter and double-check the wiring. To be extra safe, you could even unplug the motor signal wires and enable debugging in ArduinoQuadcopter.ino to check MPU6050 input, receiver input, and motor output values before running a physical test. Once you have confirmed that everything is working properly, you are good-to-go!
+
+Other notes:
+I have made a minor modification to the EnableInterrupt library to ensure compatibility with the Arduino Wire library (see line ~879 of EnableInterrupt.h).
 
 #Arduino Nano v3.0 (ATmega328P)
 * Description: Every quadcopter needs a flight controller to process IMU inputs, receiver inputs, and flight algorithms. As you probably know from looking at the name of this project, I am using an Arduino Nano as a flight controller for my quadcopter. The Arduino Nano is essentially a scaled-down version of the Arduino Uno. It is powered by the ATmega328P microcontroller, unlike versions 2.x of the Nano. It has 14 digital IO pins (6 of which provide PWM output), 8 analog pins, and a 16 MHz clock speed. Hence its name, the Arduino Nano is only 45 x 18 mm in size and weighs only 5 grams.
