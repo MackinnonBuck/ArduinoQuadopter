@@ -1,9 +1,23 @@
+/*
+ * ArduinoQuadcopter.ino
+ *
+ *  Created on: May 15, 2015
+ *      Author: Mackinnon Buck
+ */
+
 #include <Servo.h>
 #include <Wire.h>
 #include "PID_v1.h"
 #include "MPU6050Manager.h"
 #include "ReceiverManager.h"
 #include "ESC.h"
+
+#define OFFSET_ACCEL_X                                          -108
+#define OFFSET_ACCEL_Y                                          1160
+#define OFFSET_ACCEL_Z                                          2288
+#define OFFSET_GYRO_X                                           28
+#define OFFSET_GYRO_Y                                           -28
+#define OFFSET_GYRO_Z                                           8
 
 #define ESC_FRONT_LEFT_PIN					9
 #define ESC_FRONT_RIGHT_PIN					10
@@ -16,11 +30,17 @@
 
 #define PITCHROLL_KP						0.2
 #define PITCHROLL_KI						0.1
-#define PITCHROLL_KD						0.085
+#define PITCHROLL_KD						0.08
 
 #define CONTROLLER_THROTTLE_DEADZONE		                0.1
-#define CONTROLLER_YAW_SENSITIVITY			        1.0
+#define CONTROLLER_YAW_SENSITIVITY			        1.5
 #define CONTROLLER_PITCHROLL_SENSITIVITY	                0.1
+
+// Uncomment a debug macro definition to enable its corresponding debug process
+//#define DEBUG_MOTORSPEED
+//#define DEBUG_IMU_YPR
+//#define DEBUG_IMU_RATE
+//#define DEBUG_RECEIVER
 
 ESC frontLeftESC;
 ESC frontRightESC;
@@ -58,7 +78,7 @@ void setup()
   Serial.begin(115200);
 
   // Initialize the MPU6050Manager
-  MPU6050Manager::getInstance()->initialize(-108, 1160, 2288, 28, -28, 8);
+  MPU6050Manager::getInstance()->initialize(OFFSET_ACCEL_X, OFFSET_ACCEL_Y, OFFSET_ACCEL_Z, OFFSET_GYRO_X, OFFSET_GYRO_Y, OFFSET_GYRO_Z);
 
   // Initialize the ReceiverManager
   ReceiverManager::getInstance()->initialize();
@@ -96,12 +116,13 @@ void loop()
     {
       if (rollPID.GetMode() == MANUAL)
       {
+        yawPID.SetMode(AUTOMATIC);
         rollPID.SetMode(AUTOMATIC);
         pitchPID.SetMode(AUTOMATIC);
       }
 
-      yawInput = MPU6050Manager::getInstance()->getRate()[0] / 360.0 +
-                 ReceiverManager::getInstance()->getValues()[1] * CONTROLLER_YAW_SENSITIVITY;
+      yawInput = (MPU6050Manager::getInstance()->getRate()[0] / 360.0 +
+                  (ReceiverManager::getInstance()->getValues()[1] - 0.5) * 2.0) * CONTROLLER_YAW_SENSITIVITY;
 
       rollInput = -(MPU6050Manager::getInstance()->getYawPitchRoll()[2] / 180.0) -
                   ((ReceiverManager::getInstance()->getValues()[3] - 0.5) * 2.0) * CONTROLLER_PITCHROLL_SENSITIVITY;
@@ -147,7 +168,7 @@ void loop()
     /* ---------- DEBUGGING ---------- */
 
     // Motor speed debugging
-    /** /
+#ifdef DEBUG_MOTORSPEED
     Serial.print("fl-fr-rl-rr\t");
     Serial.print(frontLeftESC.getValue());
     Serial.print("\t");
@@ -157,40 +178,40 @@ void loop()
     Serial.print("\t");
     Serial.print(rearRightESC.getValue());
     Serial.println();
-    /**/
+#endif
 
     // MPU6050 ypr debugging
-    /** /
+#ifdef DEBUG_IMU_YPR
     Serial.print("ypr\t");
     for (int i = 0; i < 3; i++)
     {
-    	Serial.print(MPU6050Manager::getInstance()->getYawPitchRoll()[i]);
-    	Serial.print("\t");
+      Serial.print(MPU6050Manager::getInstance()->getYawPitchRoll()[i]);
+      Serial.print("\t");
     }
     Serial.println();
-    /**/
+#endif
 
     // MPU6050 rate debugging
-    /** /
+#ifdef DEBUG_IMU_RATE
     Serial.print("rate (ypr)");
     for (int i = 0; i < 3; i++)
     {
-    	Serial.print(MPU6050Manager::getInstance()->getRate()[i]);
-    	Serial.print("\t");
+      Serial.print(MPU6050Manager::getInstance()->getRate()[i]);
+      Serial.print("\t");
     }
     Serial.println();
-    /**/
+#endif
 
     // Receiver debugging
-    /** /
+#ifdef DEBUG_RECEIVER
     Serial.print("typr:\t");
     for (int i = 0; i < PIN_COUNT; i++)
     {
-    	Serial.print(ReceiverManager::getInstance()->getValues()[i]);
-    	Serial.print("\t");
+      Serial.print(ReceiverManager::getInstance()->getValues()[i]);
+      Serial.print("\t");
     }
     Serial.println();
-    /**/
+#endif
   }
 
   MPU6050Manager::getInstance()->update();

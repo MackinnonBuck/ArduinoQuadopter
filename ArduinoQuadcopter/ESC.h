@@ -2,7 +2,7 @@
  * ESC.h
  *
  *  Created on: May 4, 2015
- *      Author: Buck
+ *      Author: Mackinnon Buck
  */
 
 #ifndef ESC_H_
@@ -15,20 +15,20 @@
 
 class ESC
 {
-private:
+  private:
 
-	Servo m_servo;
+    Servo m_servo;
 
-	float m_value;
+    float m_value;
 
-public:
+  public:
 
-	ESC();
-	ESC(int pin);
+    ESC();
+    ESC(int pin);
 
-	void setValue(float value);
+    void setValue(float value);
 
-	float getValue();
+    float getValue();
 
 };
 
