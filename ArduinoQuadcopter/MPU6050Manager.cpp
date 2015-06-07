@@ -13,7 +13,7 @@ MPU6050Manager* MPU6050Manager::m_pInstance = 0;
  * Default constructor
  */
 MPU6050Manager::MPU6050Manager() :
-  m_initSuccessful(false), m_updateTime(0), m_deltaTime(0)
+  m_initStatus(false), m_currentTime(0), m_updateTime(0), m_deltaTime(0)
 {
   for (int i = 0; i < 3; i++)
   {
@@ -44,19 +44,21 @@ bool MPU6050Manager::initialize(int16_t xAccelOffset, int16_t yAccelOffset,
 {
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
   Wire.begin();
-  TWBR = 24;
 #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
   Fastwire::setup(400, true);
 #endif
 
   m_mpu.initialize();
-
+  
+  delay(10);
+  
+  m_initStatus = m_mpu.testConnection();
   Serial.println(
-    m_initSuccessful = m_mpu.testConnection() ?
+    m_initStatus ?
     "MPU6050 connection successful" :
     "MPU6050 connection failed");
 
-  if (m_initSuccessful)
+  if (m_initStatus)
   {
     m_mpu.setXAccelOffset(xAccelOffset);
     m_mpu.setYAccelOffset(yAccelOffset);
@@ -71,7 +73,7 @@ bool MPU6050Manager::initialize(int16_t xAccelOffset, int16_t yAccelOffset,
     update();
   }
 
-  return m_initSuccessful;
+  return m_initStatus;
 }
 
 /*
@@ -79,7 +81,7 @@ bool MPU6050Manager::initialize(int16_t xAccelOffset, int16_t yAccelOffset,
  */
 bool MPU6050Manager::initSuccessful()
 {
-  return m_initSuccessful;
+  return m_initStatus;
 }
 
 /*
@@ -87,7 +89,7 @@ bool MPU6050Manager::initSuccessful()
  */
 void MPU6050Manager::update()
 {
-  if (m_initSuccessful)
+  if (m_initStatus)
   {
     m_currentTime = millis();
     m_deltaTime = m_currentTime - m_updateTime;
@@ -95,13 +97,13 @@ void MPU6050Manager::update()
     
     m_mpu.getMotion6(&m_accel[0], &m_accel[1], &m_accel[2], &m_gyro[0], &m_gyro[1], &m_gyro[2]);
     
-    m_gravity[0] = (float)m_accel[0] * (ACCEL_RANGE / 32768.0f);
-    m_gravity[1] = (float)m_accel[1] * (ACCEL_RANGE / 32768.0f);
-    m_gravity[2] = (float)m_accel[2] * (ACCEL_RANGE / 32768.0f);
+    m_gravity[0] = (float)m_accel[0] * (MPU6050_ACCEL_RANGE / 32768.0f);
+    m_gravity[1] = (float)m_accel[1] * (MPU6050_ACCEL_RANGE / 32768.0f);
+    m_gravity[2] = (float)m_accel[2] * (MPU6050_ACCEL_RANGE / 32768.0f);
     
-    m_rate[0] = (float)m_gyro[0] * (GYRO_RANGE / 32768.0f);
-    m_rate[1] = -(float)m_gyro[1] * (GYRO_RANGE / 32768.0f);
-    m_rate[2] = (float)m_gyro[2] * (GYRO_RANGE / 32768.0f);
+    m_rate[0] = (float)m_gyro[0] * (MPU6050_GYRO_RANGE / 32768.0f);
+    m_rate[1] = -(float)m_gyro[1] * (MPU6050_GYRO_RANGE / 32768.0f);
+    m_rate[2] = (float)m_gyro[2] * (MPU6050_GYRO_RANGE / 32768.0f);
     
     m_ypr[0] += m_rate[2] * (m_deltaTime / 1000.0f);
     m_ypr[1] = MPU6050_FILTER * (m_ypr[1] + m_rate[0] * (m_deltaTime / 1000.0f)) + (1 - MPU6050_FILTER) * (atan(m_gravity[1] / sqrt(sq(m_gravity[0]) + sq(m_gravity[2]))) * RAD_TO_DEG);

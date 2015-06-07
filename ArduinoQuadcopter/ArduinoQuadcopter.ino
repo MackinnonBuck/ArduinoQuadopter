@@ -5,10 +5,6 @@
  *      Author: Mackinnon Buck
  */
 
-/*
- * TODO: Change the receiver programming to accommodate for the new control loop
- */
-
 #include <Servo.h>
 #include <Wire.h>
 #include "PID_v1.h"
@@ -21,7 +17,7 @@
 #define OFFSET_ACCEL_Z                                          2288
 #define OFFSET_GYRO_X                                           28
 #define OFFSET_GYRO_Y                                           -28
-#define OFFSET_GYRO_Z                                           8
+#define OFFSET_GYRO_Z                                           -3
 
 #define ESC_FRONT_LEFT_PIN					9
 #define ESC_FRONT_RIGHT_PIN					10
@@ -40,10 +36,10 @@
 #define CONTROLLER_YAW_SENSITIVITY			        1.5
 #define CONTROLLER_PITCHROLL_SENSITIVITY	                0.1
 
-#define LOOP_TARGET_DURATION                                    20
+#define LOOP_TARGET_DURATION                                    50
 
 // Uncomment a debug macro definition to enable its corresponding debug process
-#define DEBUG_MOTORSPEED
+//#define DEBUG_MOTORSPEED
 //#define DEBUG_IMU_YPR
 //#define DEBUG_IMU_RATE
 //#define DEBUG_IMU_GRAVITY
@@ -115,12 +111,14 @@ void setup()
 
 void loop()
 {
-  loopStartTime = millis();
-  
   if (!MPU6050Manager::getInstance()->initSuccessful()) return;
+  
+  loopStartTime = millis();
 
-  MPU6050Manager::getInstance()->update();
+  /* ---------- FLIGHT PROCESSING ---------- */
+  
   ReceiverManager::getInstance()->update();
+  MPU6050Manager::getInstance()->update();
 
   if (ReceiverManager::getInstance()->getValues()[0] > CONTROLLER_THROTTLE_DEADZONE)
   {
@@ -140,9 +138,9 @@ void loop()
     pitchInput = -(MPU6050Manager::getInstance()->getYawPitchRoll()[1] / 180.0) -
                  ((ReceiverManager::getInstance()->getValues()[2] - 0.5) * 2.0) * CONTROLLER_PITCHROLL_SENSITIVITY;
 
-    yawPID.Compute();
-    rollPID.Compute();
-    pitchPID.Compute();
+    while (!yawPID.Compute());
+    while (!rollPID.Compute());
+    while (!pitchPID.Compute());
 
     frontLeftESC.setValue(trim(-rollOutput + pitchOutput + yawOutput +
                                ReceiverManager::getInstance()->getValues()[0], 0.0, 1.0));
@@ -233,9 +231,12 @@ void loop()
   Serial.println();
 #endif
 
+  /* ---------- DELTA TIMING ---------- */
+  
   loopDuration = millis() - loopStartTime;
   if (loopDuration < LOOP_TARGET_DURATION)
   {
     delay(LOOP_TARGET_DURATION - loopDuration);
   }
+  
 }

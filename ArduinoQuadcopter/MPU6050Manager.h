@@ -10,9 +10,9 @@
 
 #include "MPU6050.h"
 
-#define GYRO_RANGE            2000
-#define ACCEL_RANGE           16
-#define MPU6050_FILTER        0.95
+#define MPU6050_GYRO_RANGE            2000
+#define MPU6050_ACCEL_RANGE           16
+#define MPU6050_FILTER                0.95
 
 class MPU6050Manager
 {
@@ -23,7 +23,7 @@ class MPU6050Manager
 
     MPU6050 m_mpu;
 
-    bool m_initSuccessful;
+    bool m_initStatus;
     
     int16_t m_accel[3];
     int16_t m_gyro[3];
